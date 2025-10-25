@@ -1,0 +1,78 @@
+Part 1 (Setup)
+- Using github cli create a new public repositoy called "pokedex"
+- Claude Code + Figma MCP Server (manual step)
+
+Part 2
+- The user story will follow the structure bellow:
+    - Given - when - then 
+    - Rol 
+    - Complexity (Using fibonacci stimation)
+    - Brief description
+    - Acceptance criteria
+    - Definition of done
+
+Requirements section
+Frontend
+Create a Pokémon app with the following features:
+Login screen:
+● The creds consist of a username/password form. You should validate the user
+credentials in a backend you have to build. (admin as username and admin as
+password, anything different should be considered as incorrect creds). Show all the
+validation that you think makes sense.
+● The user should remain logged against a storage instance that fits your preference
+(Local db, Local storage, cookies). Routes should be protected, so if an already logged
+in user tries to log in, it should be redirected to the main page, and if it is not logged in
+and it tries to go to the main page, it should be redirected to the login page.
+Main page:
+● The home screen will have a search bar with a list of Pokémon. You’ll have to use an
+API with the requirements described below. The API response will be paginated, so
+you should create a solution for it.
+● Users should be able to sort results by name and number.
+● Each Pokémon should be shown with its photo, name, and number
+Detail view:
+● If the user clicks on a Pokémon from the list, the user should be redirected to a
+detailed Pokémon page with detailed information about the Pokémon (Abilities, moves,
+and forms).
+Final Design:
+● In this link, you will find the design requirements the application should follow. Figma
+design. The design is done for a mobile screen, but feel free to adapt the design for
+bigger screens.
+***Notes***:
+● Feel free to use any library for local state management and UI.
+● You should keep in mind SEO and responsiveness as part of your implementation.
+● We will evaluate the architecture you think is better for the app. Please keep in mind
+that the app could have more features in the future.
+● Be prepared to discuss your solution.
+
+Backend
+● You will implement your own lightweight backend that will rely on
+https://pokeapi.co/ as a source of truth to obtain Pokémon information. You may use
+any backend technology you're comfortable with (e.g., Ruby on Rails,
+Node.js/Express, Python/Flask or FastAPI, PHP/Laravel, etc.)
+● This backend should provide three endpoints:
+○ Login: this is to handle credentials authorization (admin/admin)
+○ /pokemons: it should provide all the pokemons paginated as in the pokeapi
+○ /pokemons/{id}: it should provide the detailed information of a pokémon.
+● Feel free to add any other endpoint you consider necessary to implement the
+application.
+● Notes:
+○ You can use GenAI to help write or optimize your code — we encourage you
+to!
+○ If you do use GenAI tools (Cursor, Claude Code, etc.), please share the
+prompts you used and any modifications you made to the AI-generated code.
+○ You do not need to implement full authentication or a production-ready DB
+unless you want to.
+○ You may use in-memory data, SQLite, or any lightweight DB of your choice.
+
+- For the requeriments section use the user story format above 
+- Create an application using nextjs15 for the frontend section and node24 for the backend section
+- For the frontend section: use atomic design to organize components. Document them using JSDocs, send all utility functions+global constants+enums to a different file, use container presentational pattern for each page. Also, use Zustand as state management tool. Add unit tests for each utility function and component.
+- For the backend section: just add JSDocs for each endpoint
+
+Finally, after the application is created, there's a GenAI task. The following task should also be added in the same repo in a README file.
+
+Generate a Table component for a simple task management system using your preferred language (in this scenario, TypeScript). The system should support the following functionality:
+● Create, read, update, and delete tasks (CRUD)
+● Each task has a title, description, status, and due_date
+● Tasks are associated with a user (assume basic User model exists)
+
