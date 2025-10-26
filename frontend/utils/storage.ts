@@ -6,15 +6,20 @@
 import { STORAGE_KEYS } from '@/constants/storage';
 
 /**
- * Saves authentication token to local storage
+ * Saves authentication token to local storage and cookies
  * @param {string} token - The authentication token
  * @param {number} expiresAt - Token expiration timestamp
  */
 export const saveAuthToken = (token: string, expiresAt: number): void => {
   if (typeof window === 'undefined') return;
 
+  // Save to localStorage
   localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
   localStorage.setItem(STORAGE_KEYS.TOKEN_EXPIRY, expiresAt.toString());
+
+  // Save to cookies for middleware access
+  const expiryDate = new Date(expiresAt);
+  document.cookie = `${STORAGE_KEYS.AUTH_TOKEN}=${token}; expires=${expiryDate.toUTCString()}; path=/; SameSite=Lax`;
 };
 
 /**
@@ -39,13 +44,17 @@ export const getAuthToken = (): string | null => {
 };
 
 /**
- * Removes authentication token from local storage
+ * Removes authentication token from local storage and cookies
  */
 export const clearAuthToken = (): void => {
   if (typeof window === 'undefined') return;
 
+  // Clear from localStorage
   localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
   localStorage.removeItem(STORAGE_KEYS.TOKEN_EXPIRY);
+
+  // Clear from cookies
+  document.cookie = `${STORAGE_KEYS.AUTH_TOKEN}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax`;
 };
 
 /**

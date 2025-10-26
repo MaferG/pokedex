@@ -17,6 +17,7 @@ export const getPokemons = async (req, res) => {
     const limit = parseInt(req.query.limit) || 20;
     const offset = parseInt(req.query.offset) || 0;
     const search = req.query.search;
+    const sort = req.query.sort; // 'number' or 'name'
 
     // Validate pagination parameters
     if (limit < 1 || limit > 100) {
@@ -28,6 +29,13 @@ export const getPokemons = async (req, res) => {
     if (offset < 0) {
       return res.status(HTTP_STATUS.BAD_REQUEST).json({
         error: 'Offset must be non-negative',
+      });
+    }
+
+    // Validate sort parameter
+    if (sort && sort !== 'number' && sort !== 'name') {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
+        error: 'Sort must be either "number" or "name"',
       });
     }
 
@@ -50,6 +58,17 @@ export const getPokemons = async (req, res) => {
 
     // Get paginated list
     const data = await getPokemonList(limit, offset);
+
+    // Apply sorting if requested
+    if (sort) {
+      data.results.sort((a, b) => {
+        if (sort === 'name') {
+          return a.name.localeCompare(b.name);
+        }
+        // Default is by number (id)
+        return a.id - b.id;
+      });
+    }
 
     res.status(HTTP_STATUS.OK).json(data);
   } catch (error) {

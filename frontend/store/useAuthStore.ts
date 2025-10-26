@@ -3,8 +3,8 @@
  * @module store/useAuthStore
  */
 
-import { create } from 'zustand';
-import { saveAuthToken, clearAuthToken, getAuthToken } from '@/utils/storage';
+import { create } from "zustand";
+import { saveAuthToken, clearAuthToken, getAuthToken } from "@/utils/storage";
 
 interface AuthState {
   token: string | null;

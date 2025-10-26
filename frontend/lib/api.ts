@@ -5,7 +5,7 @@
 
 import axios, { AxiosError } from 'axios';
 import { API_BASE_URL, API_ENDPOINTS } from '@/constants/api';
-import { getAuthToken } from '@/utils/storage';
+import { getAuthToken, clearAuthToken } from '@/utils/storage';
 import type { LoginCredentials, LoginResponse } from '@/types/auth';
 import type { PokemonListResponse, PokemonDetail } from '@/types/pokemon';
 
@@ -16,7 +16,7 @@ import type { PokemonListResponse, PokemonDetail } from '@/types/pokemon';
 const getApiClient = () => {
   const token = getAuthToken();
 
-  return axios.create({
+  const client = axios.create({
     baseURL: API_BASE_URL,
     headers: token
       ? {
@@ -24,6 +24,24 @@ const getApiClient = () => {
         }
       : undefined,
   });
+
+  // Add response interceptor to handle 401 errors
+  client.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (error.response?.status === 401) {
+        // Token is invalid or expired
+        clearAuthToken();
+        // Redirect to login page
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
+      }
+      return Promise.reject(error);
+    }
+  );
+
+  return client;
 };
 
 /**
@@ -69,13 +87,15 @@ export const logout = async (): Promise<void> => {
  * @param {number} [limit=20] - Number of Pokemon per page
  * @param {number} [offset=0] - Starting position for pagination
  * @param {string} [search] - Search query
+ * @param {'number' | 'name'} [sortBy] - Sort order (number or name)
  * @returns {Promise<PokemonListResponse>} Paginated Pokemon list
  * @throws {Error} If the request fails
  */
 export const getPokemons = async (
   limit: number = 20,
   offset: number = 0,
-  search?: string
+  search?: string,
+  sortBy?: 'number' | 'name'
 ): Promise<PokemonListResponse> => {
   try {
     const client = getApiClient();
@@ -86,6 +106,10 @@ export const getPokemons = async (
 
     if (search) {
       params.append('search', search);
+    }
+
+    if (sortBy) {
+      params.append('sort', sortBy);
     }
 
     const { data } = await client.get<PokemonListResponse>(
