@@ -14,6 +14,7 @@ export default function PokedexPage() {
   const [sortModalOpen, setSortModalOpen] = useState(false);
   const [sortBy, setSortBy] = useState<"number" | "name">("number");
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [pokemon, setPokemon] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,10 +26,19 @@ export default function PokedexPage() {
     checkAuth();
   }, [checkAuth]);
 
+  // Debounce search query - wait 500ms after user stops typing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   // Reset to page 1 when search or sort changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, sortBy]);
+  }, [debouncedSearchQuery, sortBy]);
 
   useEffect(() => {
     const fetchPokemon = async () => {
@@ -39,7 +49,7 @@ export default function PokedexPage() {
 
       try {
         const offset = (currentPage - 1) * limit;
-        const data = await getPokemons(limit, offset, searchQuery, sortBy);
+        const data = await getPokemons(limit, offset, debouncedSearchQuery, sortBy);
         setPokemon(data.results);
         setTotalCount(data.count);
       } catch (err) {
@@ -52,7 +62,7 @@ export default function PokedexPage() {
     };
 
     fetchPokemon();
-  }, [currentPage, isAuthenticated, searchQuery, sortBy]);
+  }, [currentPage, isAuthenticated, debouncedSearchQuery, sortBy]);
 
   // Removed client-side sorting - now handled by backend
 

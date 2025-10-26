@@ -178,23 +178,48 @@ export const getPokemonDetails = async (id) => {
  */
 export const getSortedPokemonList = async (limit = 20, offset = 0, sortBy = 'number') => {
   try {
-    // Get all Pokemon from cache
-    const allPokemon = await getAllPokemonCached();
+    // For sorting by number (ID), we can just use the regular endpoint
+    // since it's already sorted by ID
+    if (sortBy === 'number') {
+      return await getPokemonList(limit, offset);
+    }
 
-    // Sort the results
-    const sorted = [...allPokemon].sort((a, b) => {
-      if (sortBy === 'name') {
-        return a.name.localeCompare(b.name);
-      }
-      return a.id - b.id;
+    // For sorting by name, we need to fetch all names first (lightweight),
+    // then fetch details only for the page we need
+    const allNamesResponse = await axios.get(`${CONFIG.POKEAPI_BASE_URL}/pokemon`, {
+      params: { limit: 2000, offset: 0 },
     });
 
-    // Paginate the sorted results
-    const paginatedResults = sorted.slice(offset, offset + limit);
+    // Sort all Pokemon names
+    const sortedNames = allNamesResponse.data.results.sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+
+    // Paginate the sorted names
+    const paginatedNames = sortedNames.slice(offset, offset + limit);
+
+    // Fetch details only for the current page
+    const pokemonWithDetails = await Promise.all(
+      paginatedNames.map(async (pokemon) => {
+        try {
+          const detailResponse = await axios.get(pokemon.url);
+          return {
+            id: detailResponse.data.id,
+            name: pokemon.name,
+            url: pokemon.url,
+            image: detailResponse.data.sprites.other['official-artwork'].front_default ||
+                   detailResponse.data.sprites.front_default,
+          };
+        } catch (error) {
+          console.error(`Error fetching details for ${pokemon.name}:`, error.message);
+          return null;
+        }
+      })
+    );
 
     return {
-      count: sorted.length,
-      results: paginatedResults,
+      count: sortedNames.length,
+      results: pokemonWithDetails.filter(p => p !== null),
     };
   } catch (error) {
     console.error('Error fetching sorted Pokemon list:', error.message);
@@ -212,21 +237,42 @@ export const getSortedPokemonList = async (limit = 20, offset = 0, sortBy = 'num
  */
 export const searchPokemonByName = async (query, limit = 20, offset = 0) => {
   try {
-    // Get all Pokemon from cache
-    const allPokemon = await getAllPokemonCached();
+    // Fetch all Pokemon names (lightweight)
+    const allNamesResponse = await axios.get(`${CONFIG.POKEAPI_BASE_URL}/pokemon`, {
+      params: { limit: 2000, offset: 0 },
+    });
 
     // Filter Pokemon by partial name match
     const searchLower = query.toLowerCase();
-    const filteredPokemon = allPokemon.filter(pokemon =>
+    const filteredNames = allNamesResponse.data.results.filter(pokemon =>
       pokemon.name.toLowerCase().includes(searchLower)
     );
 
-    // Paginate the filtered results
-    const paginatedResults = filteredPokemon.slice(offset, offset + limit);
+    // Paginate the filtered names
+    const paginatedNames = filteredNames.slice(offset, offset + limit);
+
+    // Fetch details only for the current page
+    const pokemonWithDetails = await Promise.all(
+      paginatedNames.map(async (pokemon) => {
+        try {
+          const detailResponse = await axios.get(pokemon.url);
+          return {
+            id: detailResponse.data.id,
+            name: pokemon.name,
+            url: pokemon.url,
+            image: detailResponse.data.sprites.other['official-artwork'].front_default ||
+                   detailResponse.data.sprites.front_default,
+          };
+        } catch (error) {
+          console.error(`Error fetching details for ${pokemon.name}:`, error.message);
+          return null;
+        }
+      })
+    );
 
     return {
-      count: filteredPokemon.length,
-      results: paginatedResults,
+      count: filteredNames.length,
+      results: pokemonWithDetails.filter(p => p !== null),
     };
   } catch (error) {
     console.error('Error searching Pokemon:', error.message);
