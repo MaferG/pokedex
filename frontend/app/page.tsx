@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { PokemonCard } from "@/components/molecules/pokemon-card";
 import { SortModal } from "@/components/organisms/sort-modal";
 import { Search, SortAsc, ChevronLeft, ChevronRight } from "lucide-react";
@@ -58,9 +59,9 @@ export default function PokedexPage() {
   const totalPages = Math.ceil(totalCount / limit);
 
   return (
-    <div className="min-h-screen bg-[#EFEFEF]">
+    <div className="min-h-screen bg-[#DC0A2D] ">
       {/* Header */}
-      <header className="bg-[#DC0A2D] px-4 py-6 shadow-[0_2px_8px_rgba(0,0,0,0.2)]">
+      <header className="bg-[#DC0A2D] px-4 py-6 ">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
@@ -89,14 +90,32 @@ export default function PokedexPage() {
               onClick={() => setSortModalOpen(true)}
               className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_12px_rgba(0,0,0,0.15)] transition-shadow"
             >
-              <SortAsc className="w-6 h-6 text-[#DC0A2D]" />
+              {sortBy === "number" ? (
+                <span className="text-[#DC0A2D] text-[14px] leading-[16px] font-bold">
+                  <Image
+                    src="/number.svg"
+                    alt="Sort by Number"
+                    width={25}
+                    height={25}
+                  />
+                </span>
+              ) : (
+                <span className="text-[#DC0A2D] text-[14px] leading-[16px] font-bold">
+                  <Image
+                    src="/name.svg"
+                    alt="Sort by Name"
+                    width={25}
+                    height={25}
+                  />
+                </span>
+              )}
             </button>
           </div>
         </div>
       </header>
 
       {/* Pokemon Grid */}
-      <main className="max-w-7xl mx-auto px-4 py-6">
+      <main className="px-2 py-6 justify-self-center w-full">
         {isLoading ? (
           <div className="flex justify-center items-center min-h-[400px]">
             <div className="text-[#666666] text-lg">Loading Pokemon...</div>
@@ -107,7 +126,7 @@ export default function PokedexPage() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            <div className="grid rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.1)] bg-white grid-cols-3 gap-4 mb-6 p-4">
               {pokemon.map((p) => (
                 <PokemonCard
                   key={p.id}
