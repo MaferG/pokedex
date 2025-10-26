@@ -37,17 +37,48 @@ const TYPE_COLORS: Record<string, string> = {
   water: "#6493EB",
 };
 
-export default function PokemonDetailPage() {
+const PokemonDetailPage = () => {
+  // --- Hooks -----------------------------------------------------------------
   const { checkAuth, isAuthenticated } = useAuthStore();
   const router = useRouter();
   const params = useParams();
-  const id = params?.id as string;
+  // --- END: Hooks ------------------------------------------------------------
 
+  // --- Local state -----------------------------------------------------------
   const [pokemon, setPokemon] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalPokemon, setTotalPokemon] = useState<number>(0);
+  // --- END: Local state ------------------------------------------------------
 
+  // --- Refs ------------------------------------------------------------------
+  // --- END: Refs -------------------------------------------------------------
+
+  // --- Data and handlers -----------------------------------------------------
+  const id = params?.id as string;
+  const typeColor =
+    TYPE_COLORS[pokemon?.types[0]?.name?.toLowerCase()] || "#AAA67F";
+  const abilities = pokemon?.abilities.map((a: { name: string }) => a.name).join(" ");
+  const currentId = parseInt(id);
+  const isFirstPokemon = currentId === 1;
+  const isLastPokemon = currentId === totalPokemon;
+
+  const handlePrevious = () => {
+    const currentId = parseInt(id);
+    if (currentId > 1) {
+      router.push(`/pokemon/${currentId - 1}`);
+    }
+  };
+
+  const handleNext = () => {
+    const currentId = parseInt(id);
+    if (currentId < totalPokemon) {
+      router.push(`/pokemon/${currentId + 1}`);
+    }
+  };
+  // --- END: Data and handlers ------------------------------------------------
+
+  // --- Side effects ----------------------------------------------------------
   useEffect(() => {
     checkAuth();
     if (!isAuthenticated) {
@@ -80,20 +111,7 @@ export default function PokemonDetailPage() {
 
     fetchPokemonDetail();
   }, [id, isAuthenticated]);
-
-  const handlePrevious = () => {
-    const currentId = parseInt(id);
-    if (currentId > 1) {
-      router.push(`/pokemon/${currentId - 1}`);
-    }
-  };
-
-  const handleNext = () => {
-    const currentId = parseInt(id);
-    if (currentId < totalPokemon) {
-      router.push(`/pokemon/${currentId + 1}`);
-    }
-  };
+  // --- END: Side effects -----------------------------------------------------
 
   if (!isAuthenticated) {
     return null;
@@ -121,13 +139,6 @@ export default function PokemonDetailPage() {
       </div>
     );
   }
-
-  const typeColor =
-    TYPE_COLORS[pokemon.types[0]?.name?.toLowerCase()] || "#AAA67F";
-  const abilities = pokemon.abilities.map((a: any) => a.name).join(" ");
-  const currentId = parseInt(id);
-  const isFirstPokemon = currentId === 1;
-  const isLastPokemon = currentId === totalPokemon;
 
   return (
     <div
@@ -302,4 +313,6 @@ export default function PokemonDetailPage() {
       </div>
     </div>
   );
-}
+};
+
+export default PokemonDetailPage;

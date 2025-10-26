@@ -15,20 +15,33 @@ interface SortModalProps {
   currentSort: "number" | "name";
 }
 
-export function SortModal({
+const SortModal = ({
   isOpen,
   onClose,
   onSort,
   currentSort,
-}: SortModalProps) {
+}: SortModalProps) => {
+  // --- Hooks -----------------------------------------------------------------
+  // --- END: Hooks ------------------------------------------------------------
+
+  // --- Local state -----------------------------------------------------------
   const [selected, setSelected] = useState<"number" | "name">(currentSort);
+  // --- END: Local state ------------------------------------------------------
 
-  if (!isOpen) return null;
+  // --- Refs ------------------------------------------------------------------
+  // --- END: Refs -------------------------------------------------------------
 
+  // --- Data and handlers -----------------------------------------------------
   const handleSelect = (value: "number" | "name") => {
     setSelected(value);
     onSort(value);
   };
+  // --- END: Data and handlers ------------------------------------------------
+
+  // --- Side effects ----------------------------------------------------------
+  // --- END: Side effects -----------------------------------------------------
+
+  if (!isOpen) return null;
 
   return (
     <div
@@ -74,4 +87,6 @@ export function SortModal({
       </div>
     </div>
   );
-}
+};
+
+export { SortModal };

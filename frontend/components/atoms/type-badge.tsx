@@ -29,8 +29,22 @@ const typeColors: Record<string, string> = {
   water: "#6493EB",
 }
 
-export function TypeBadge({ type }: TypeBadgeProps) {
+const TypeBadge = ({ type }: TypeBadgeProps) => {
+  // --- Hooks -----------------------------------------------------------------
+  // --- END: Hooks ------------------------------------------------------------
+
+  // --- Local state -----------------------------------------------------------
+  // --- END: Local state ------------------------------------------------------
+
+  // --- Refs ------------------------------------------------------------------
+  // --- END: Refs -------------------------------------------------------------
+
+  // --- Data and handlers -----------------------------------------------------
   const bgColor = typeColors[type.toLowerCase()] || "#AAA67F"
+  // --- END: Data and handlers ------------------------------------------------
+
+  // --- Side effects ----------------------------------------------------------
+  // --- END: Side effects -----------------------------------------------------
 
   return (
     <span
@@ -41,3 +55,5 @@ export function TypeBadge({ type }: TypeBadgeProps) {
     </span>
   )
 }
+
+export { TypeBadge }

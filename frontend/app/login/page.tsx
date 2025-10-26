@@ -18,25 +18,22 @@ import { Label } from "@/components/atoms/label";
 
 /**
  * Login page component (Presentational)
- * @returns {JSX.Element} Login page
  */
-export default function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+const LoginPage = () => {
+  // --- Hooks -----------------------------------------------------------------
   const { login, checkAuth, isAuthenticated } = useAuthStore();
   const router = useRouter();
+  // --- END: Hooks ------------------------------------------------------------
 
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+  // --- Local state -----------------------------------------------------------
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  // --- END: Local state ------------------------------------------------------
 
-  useEffect(() => {
-    console.log("Login page: ");
-    if (isAuthenticated) {
-      console.log("User is authenticated, redirecting to home...");
-    }
-  }, [isAuthenticated, router]);
+  // --- Refs ------------------------------------------------------------------
+  // --- END: Refs -------------------------------------------------------------
 
+  // --- Data and handlers -----------------------------------------------------
   const handleLogin = async (username: string, password: string) => {
     setIsLoading(true);
     setError("");
@@ -62,6 +59,20 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   };
+  // --- END: Data and handlers ------------------------------------------------
+
+  // --- Side effects ----------------------------------------------------------
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  useEffect(() => {
+    console.log("Login page: ");
+    if (isAuthenticated) {
+      console.log("User is authenticated, redirecting to home...");
+    }
+  }, [isAuthenticated, router]);
+  // --- END: Side effects -----------------------------------------------------
 
   return (
     <div
@@ -188,4 +199,6 @@ export default function LoginPage() {
       </div>
     </div>
   );
-}
+};
+
+export default LoginPage;

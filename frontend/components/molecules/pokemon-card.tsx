@@ -13,8 +13,22 @@ interface PokemonCardProps {
   image: string;
 }
 
-export function PokemonCard({ id, name, image }: PokemonCardProps) {
+const PokemonCard = ({ id, name, image }: PokemonCardProps) => {
+  // --- Hooks -----------------------------------------------------------------
+  // --- END: Hooks ------------------------------------------------------------
+
+  // --- Local state -----------------------------------------------------------
+  // --- END: Local state ------------------------------------------------------
+
+  // --- Refs ------------------------------------------------------------------
+  // --- END: Refs -------------------------------------------------------------
+
+  // --- Data and handlers -----------------------------------------------------
   const formattedId = `#${id.toString().padStart(3, "0")}`;
+  // --- END: Data and handlers ------------------------------------------------
+
+  // --- Side effects ----------------------------------------------------------
+  // --- END: Side effects -----------------------------------------------------
 
   return (
     <Link href={`/pokemon/${id}`} className="block">
@@ -40,4 +54,6 @@ export function PokemonCard({ id, name, image }: PokemonCardProps) {
       </div>
     </Link>
   );
-}
+};
+
+export { PokemonCard };

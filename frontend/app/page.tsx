@@ -8,9 +8,12 @@ import { Search, SortAsc, ChevronLeft, ChevronRight } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { getPokemons } from "@/lib/api";
 
-export default function PokedexPage() {
+const PokedexPage = () => {
+  // --- Hooks -----------------------------------------------------------------
   const { checkAuth, isAuthenticated } = useAuthStore();
+  // --- END: Hooks ------------------------------------------------------------
 
+  // --- Local state -----------------------------------------------------------
   const [sortModalOpen, setSortModalOpen] = useState(false);
   const [sortBy, setSortBy] = useState<"number" | "name">("number");
   const [searchQuery, setSearchQuery] = useState("");
@@ -20,8 +23,17 @@ export default function PokedexPage() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const limit = 20;
+  // --- END: Local state ------------------------------------------------------
 
+  // --- Refs ------------------------------------------------------------------
+  // --- END: Refs -------------------------------------------------------------
+
+  // --- Data and handlers -----------------------------------------------------
+  const limit = 20;
+  const totalPages = Math.ceil(totalCount / limit);
+  // --- END: Data and handlers ------------------------------------------------
+
+  // --- Side effects ----------------------------------------------------------
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
@@ -63,10 +75,7 @@ export default function PokedexPage() {
 
     fetchPokemon();
   }, [currentPage, isAuthenticated, debouncedSearchQuery, sortBy]);
-
-  // Removed client-side sorting - now handled by backend
-
-  const totalPages = Math.ceil(totalCount / limit);
+  // --- END: Side effects -----------------------------------------------------
 
   return (
     <div className="min-h-screen bg-[#DC0A2D] ">
@@ -185,4 +194,6 @@ export default function PokedexPage() {
       />
     </div>
   );
-}
+};
+
+export default PokedexPage;
