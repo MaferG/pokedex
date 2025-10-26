@@ -3,7 +3,7 @@
  * @module controllers/pokemon
  */
 
-import { getPokemonList, getPokemonDetails, searchPokemonByName } from '../services/pokeapi.service.js';
+import { getPokemonList, getPokemonDetails, searchPokemonByName, getSortedPokemonList } from '../services/pokeapi.service.js';
 import { HTTP_STATUS } from '../config/constants.js';
 
 /**
@@ -42,12 +42,12 @@ export const getPokemons = async (req, res) => {
     // If search query is provided, search for specific Pokemon
     if (search) {
       try {
-        const pokemon = await searchPokemonByName(search);
+        const data = await searchPokemonByName(search, limit, offset);
         return res.status(HTTP_STATUS.OK).json({
-          count: 1,
+          count: data.count,
           next: null,
           previous: null,
-          results: [pokemon],
+          results: data.results,
         });
       } catch (error) {
         return res.status(HTTP_STATUS.NOT_FOUND).json({
@@ -56,20 +56,14 @@ export const getPokemons = async (req, res) => {
       }
     }
 
-    // Get paginated list
-    const data = await getPokemonList(limit, offset);
-
-    // Apply sorting if requested
+    // If sort is requested, use sorted list
     if (sort) {
-      data.results.sort((a, b) => {
-        if (sort === 'name') {
-          return a.name.localeCompare(b.name);
-        }
-        // Default is by number (id)
-        return a.id - b.id;
-      });
+      const data = await getSortedPokemonList(limit, offset, sort);
+      return res.status(HTTP_STATUS.OK).json(data);
     }
 
+    // Get regular paginated list (default order by number)
+    const data = await getPokemonList(limit, offset);
     res.status(HTTP_STATUS.OK).json(data);
   } catch (error) {
     console.error('Error in getPokemons:', error);

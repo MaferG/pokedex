@@ -6,6 +6,64 @@
 import axios from 'axios';
 import { CONFIG } from '../config/constants.js';
 
+// Cache for all Pokemon data to avoid repeated API calls
+let pokemonCache = null;
+let cacheTimestamp = null;
+const CACHE_DURATION = 1000 * 60 * 60; // 1 hour
+
+/**
+ * Fetches and caches all Pokemon from PokeAPI
+ * @returns {Promise<Array>} Array of all Pokemon with basic details
+ */
+const getAllPokemonCached = async () => {
+  const now = Date.now();
+
+  // Return cached data if still valid
+  if (pokemonCache && cacheTimestamp && (now - cacheTimestamp < CACHE_DURATION)) {
+    return pokemonCache;
+  }
+
+  try {
+    // Fetch all Pokemon names/URLs (lightweight)
+    const response = await axios.get(`${CONFIG.POKEAPI_BASE_URL}/pokemon`, {
+      params: { limit: 2000, offset: 0 },
+    });
+
+    // Fetch details for all Pokemon in batches to avoid overwhelming the API
+    const batchSize = 50;
+    const allPokemon = [];
+
+    for (let i = 0; i < response.data.results.length; i += batchSize) {
+      const batch = response.data.results.slice(i, i + batchSize);
+      const batchDetails = await Promise.all(
+        batch.map(async (pokemon) => {
+          try {
+            const detailResponse = await axios.get(pokemon.url);
+            return {
+              id: detailResponse.data.id,
+              name: pokemon.name,
+              url: pokemon.url,
+              image: detailResponse.data.sprites.other['official-artwork'].front_default ||
+                     detailResponse.data.sprites.front_default,
+            };
+          } catch (error) {
+            console.error(`Error fetching details for ${pokemon.name}:`, error.message);
+            return null;
+          }
+        })
+      );
+      allPokemon.push(...batchDetails.filter(p => p !== null));
+    }
+
+    pokemonCache = allPokemon;
+    cacheTimestamp = now;
+    return pokemonCache;
+  } catch (error) {
+    console.error('Error fetching all Pokemon:', error.message);
+    throw new Error('Failed to fetch Pokemon data');
+  }
+};
+
 /**
  * Fetches a paginated list of Pokemon from PokeAPI
  * @param {number} [limit=20] - Number of Pokemon per page
@@ -111,25 +169,67 @@ export const getPokemonDetails = async (id) => {
 };
 
 /**
- * Searches for Pokemon by name
- * @param {string} query - Search query (Pokemon name)
- * @returns {Promise<Object>} Pokemon data if found
- * @throws {Error} If the Pokemon is not found
+ * Fetches all Pokemon and returns sorted/paginated results
+ * @param {number} limit - Number of results to return
+ * @param {number} offset - Offset for pagination
+ * @param {'number'|'name'} sortBy - Sort order
+ * @returns {Promise<{count: number, results: Array}>} Sorted Pokemon list
+ * @throws {Error} If the API request fails
  */
-export const searchPokemonByName = async (query) => {
+export const getSortedPokemonList = async (limit = 20, offset = 0, sortBy = 'number') => {
   try {
-    const response = await axios.get(`${CONFIG.POKEAPI_BASE_URL}/pokemon/${query.toLowerCase()}`);
+    // Get all Pokemon from cache
+    const allPokemon = await getAllPokemonCached();
+
+    // Sort the results
+    const sorted = [...allPokemon].sort((a, b) => {
+      if (sortBy === 'name') {
+        return a.name.localeCompare(b.name);
+      }
+      return a.id - b.id;
+    });
+
+    // Paginate the sorted results
+    const paginatedResults = sorted.slice(offset, offset + limit);
+
     return {
-      id: response.data.id,
-      name: response.data.name,
-      url: `${CONFIG.POKEAPI_BASE_URL}/pokemon/${response.data.id}`,
-      image: response.data.sprites.other['official-artwork'].front_default ||
-             response.data.sprites.front_default,
+      count: sorted.length,
+      results: paginatedResults,
     };
   } catch (error) {
-    if (error.response && error.response.status === 404) {
-      throw new Error(`Pokemon "${query}" not found`);
-    }
+    console.error('Error fetching sorted Pokemon list:', error.message);
+    throw new Error('Failed to fetch sorted Pokemon list from PokeAPI');
+  }
+};
+
+/**
+ * Searches for Pokemon by name (partial match)
+ * @param {string} query - Search query (Pokemon name)
+ * @param {number} limit - Number of results to return
+ * @param {number} offset - Offset for pagination
+ * @returns {Promise<{count: number, results: Array}>} Matching Pokemon
+ * @throws {Error} If search fails
+ */
+export const searchPokemonByName = async (query, limit = 20, offset = 0) => {
+  try {
+    // Get all Pokemon from cache
+    const allPokemon = await getAllPokemonCached();
+
+    // Filter Pokemon by partial name match
+    const searchLower = query.toLowerCase();
+    const filteredPokemon = allPokemon.filter(pokemon =>
+      pokemon.name.toLowerCase().includes(searchLower)
+    );
+
+    // Paginate the filtered results
+    const paginatedResults = filteredPokemon.slice(offset, offset + limit);
+
+    return {
+      count: filteredPokemon.length,
+      results: paginatedResults,
+    };
+  } catch (error) {
+    console.error('Error searching Pokemon:', error.message);
     throw new Error('Failed to search for Pokemon');
   }
 };
