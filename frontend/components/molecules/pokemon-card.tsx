@@ -37,7 +37,7 @@ const PokemonCard = ({ id, name, image }: PokemonCardProps) => {
         <div className="absolute bottom-0 left-0 w-full h-2/5 bg-[#EFEFEF] z-0 rounded-t-lg"></div>
 
         {/* Content */}
-        <span className="text-[#666666] text-[12px] leading-[16px]  self-end z-10">
+        <span className="text-gray-medium text-[12px] leading-4  self-end z-10">
           {formattedId}
         </span>
         <div className="w-20 h-20 md:w-50 md:h-50 relative z-10">
@@ -48,7 +48,7 @@ const PokemonCard = ({ id, name, image }: PokemonCardProps) => {
             className="object-contain"
           />
         </div>
-        <h3 className="text-[#212121] text-[14px] leading-[16px]  text-center z-10 capitalize">
+        <h3 className="text-gray-dark text-[14px] leading-4  text-center z-10 capitalize">
           {name}
         </h3>
       </div>

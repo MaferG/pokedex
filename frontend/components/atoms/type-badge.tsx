@@ -5,7 +5,7 @@
  */
 
 interface TypeBadgeProps {
-  type: string
+  type: string;
 }
 
 const typeColors: Record<string, string> = {
@@ -27,7 +27,7 @@ const typeColors: Record<string, string> = {
   rock: "#B69E31",
   steel: "#B7B9D0",
   water: "#6493EB",
-}
+};
 
 const TypeBadge = ({ type }: TypeBadgeProps) => {
   // --- Hooks -----------------------------------------------------------------
@@ -40,7 +40,7 @@ const TypeBadge = ({ type }: TypeBadgeProps) => {
   // --- END: Refs -------------------------------------------------------------
 
   // --- Data and handlers -----------------------------------------------------
-  const bgColor = typeColors[type.toLowerCase()] || "#AAA67F"
+  const bgColor = typeColors[type.toLowerCase()] || "#AAA67F";
   // --- END: Data and handlers ------------------------------------------------
 
   // --- Side effects ----------------------------------------------------------
@@ -48,12 +48,12 @@ const TypeBadge = ({ type }: TypeBadgeProps) => {
 
   return (
     <span
-      className="px-4 py-1 rounded-full text-white text-[12px] leading-[16px] font-bold capitalize"
+      className="px-4 py-1 rounded-full text-white text-[12px] leading-4 font-bold capitalize"
       style={{ backgroundColor: bgColor }}
     >
       {type}
     </span>
-  )
-}
+  );
+};
 
-export { TypeBadge }
+export { TypeBadge };

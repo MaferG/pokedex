@@ -5,16 +5,16 @@
 
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { login as apiLogin } from "@/lib/api";
 import { ROUTES } from "@/constants/routes";
 
-import { Button } from "@/components/atoms/button";
-import { Input } from "@/components/atoms/input";
-import { Label } from "@/components/atoms/label";
+import { Button } from "@/components/atoms";
+import { Input } from "@/components/atoms";
+import { Label } from "@/components/atoms";
 
 /**
  * Login page component (Presentational)
@@ -96,17 +96,17 @@ const LoginPage = () => {
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#DC0A2D]">
                 <div className="h-12 w-12 rounded-full border-4 border-white bg-[#DC0A2D]">
                   <div className="flex h-full items-center justify-center">
-                    <div className="h-3 w-3 rounded-full border-2 border-[#212121] bg-white" />
+                    <div className="h-3 w-3 rounded-full border-2 border-gray-dark bg-white" />
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Title */}
-            <h1 className="mb-2 text-center font-bold text-2xl leading-8 text-[#212121]">
+            <h1 className="mb-2 text-center font-bold text-2xl leading-8 text-gray-dark">
               Welcome back
             </h1>
-            <p className="mb-8 text-center font-normal text-sm leading-4 text-[#666666]">
+            <p className="mb-8 text-center font-normal text-sm leading-4 text-gray-medium">
               Sign in to access your Pokédex
             </p>
 
@@ -123,7 +123,7 @@ const LoginPage = () => {
               <div className="space-y-2">
                 <Label
                   htmlFor="username"
-                  className="font-bold text-sm leading-4 text-[#212121]"
+                  className="font-bold text-sm leading-4 text-gray-dark"
                 >
                   Username
                 </Label>
@@ -131,7 +131,7 @@ const LoginPage = () => {
                   id="username"
                   type="text"
                   placeholder="Enter your username"
-                  className="h-12 rounded-lg border-2 border-[#E0E0E0] bg-white font-normal text-sm leading-4 text-[#212121] placeholder:text-[#666666] focus:border-[#DC0A2D] focus:ring-0"
+                  className="h-12 rounded-lg border-2 border-[#E0E0E0] bg-white font-normal text-sm leading-4 text-gray-dark placeholder:text-gray-medium focus:border-[#DC0A2D] focus:ring-0"
                 />
               </div>
 
@@ -139,7 +139,7 @@ const LoginPage = () => {
               <div className="space-y-2">
                 <Label
                   htmlFor="password"
-                  className="font-bold text-sm leading-4 text-[#212121]"
+                  className="font-bold text-sm leading-4 text-gray-dark"
                 >
                   Password
                 </Label>
@@ -147,7 +147,7 @@ const LoginPage = () => {
                   id="password"
                   type="password"
                   placeholder="Enter your password"
-                  className="h-12 rounded-lg border-2 border-[#E0E0E0] bg-white font-normal text-sm leading-4 text-[#212121] placeholder:text-[#666666] focus:border-[#DC0A2D] focus:ring-0"
+                  className="h-12 rounded-lg border-2 border-[#E0E0E0] bg-white font-normal text-sm leading-4 text-gray-dark placeholder:text-gray-medium focus:border-[#DC0A2D] focus:ring-0"
                 />
               </div>
 
@@ -184,8 +184,8 @@ const LoginPage = () => {
               </Button>
 
               {/* Sign Up Link */}
-              <p className="text-center font-normal text-sm leading-4 text-[#666666]">
-                Don't have an account?{" "}
+              <p className="text-center font-normal text-sm leading-4 text-gray-medium">
+                Don&apos;t have an account?{" "}
                 <Link
                   href="#"
                   className="font-bold text-[#DC0A2D] hover:underline"

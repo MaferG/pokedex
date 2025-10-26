@@ -15,6 +15,7 @@ import {
 import { useAuthStore } from "@/store/useAuthStore";
 import { getPokemonDetail, getPokemons } from "@/lib/api";
 import { ROUTES } from "@/constants/routes";
+import { PokemonDetail, PokemonStat, PokemonType } from "@/types/pokemon";
 
 const TYPE_COLORS: Record<string, string> = {
   bug: "#A7B723",
@@ -45,7 +46,7 @@ const PokemonDetailPage = () => {
   // --- END: Hooks ------------------------------------------------------------
 
   // --- Local state -----------------------------------------------------------
-  const [pokemon, setPokemon] = useState<any>(null);
+  const [pokemon, setPokemon] = useState<PokemonDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalPokemon, setTotalPokemon] = useState<number>(0);
@@ -57,8 +58,12 @@ const PokemonDetailPage = () => {
   // --- Data and handlers -----------------------------------------------------
   const id = params?.id as string;
   const typeColor =
-    TYPE_COLORS[pokemon?.types[0]?.name?.toLowerCase()] || "#AAA67F";
-  const abilities = pokemon?.abilities.map((a: { name: string }) => a.name).join(" ");
+    pokemon?.types && pokemon.types[0]?.name
+      ? TYPE_COLORS[pokemon.types[0].name.toLowerCase()] || "#AAA67F"
+      : "#AAA67F";
+  const abilities = pokemon?.abilities
+    .map((a: { name: string }) => a.name)
+    .join(" ");
   const currentId = parseInt(id);
   const isFirstPokemon = currentId === 1;
   const isLastPokemon = currentId === totalPokemon;
@@ -162,10 +167,10 @@ const PokemonDetailPage = () => {
         <Link href="/" className="w-10 h-10 flex items-center justify-center">
           <ArrowLeft className="w-8 h-8 text-white" />
         </Link>
-        <h1 className="text-white text-[24px] leading-[32px] font-bold capitalize">
+        <h1 className="text-white text-[24px] leading-8 font-bold capitalize">
           {pokemon.name}
         </h1>
-        <span className="text-white text-[12px] leading-[16px] font-bold">
+        <span className="text-white text-[12px] leading-4 font-bold">
           #{pokemon.id.toString().padStart(3, "0")}
         </span>
       </header>
@@ -202,18 +207,18 @@ const PokemonDetailPage = () => {
         </div>
 
         {/* Content Card — Overlaps the image */}
-        <div className="relative bg-white rounded-t-[32px] px-6 py-8 shadow-[0_-6px_12px_rgba(0,0,0,0.1)] -mt-24 w-full flex-grow flex flex-col justify-between">
+        <div className="relative bg-white rounded-t-4xl px-6 py-8 shadow-[0_-6px_12px_rgba(0,0,0,0.1)] -mt-24 w-full grow flex flex-col justify-between">
           <div>
             {/* Type Badges */}
             <div className="flex justify-center gap-3 mb-6 pt-16">
-              {pokemon.types.map((type: any) => (
+              {pokemon.types.map((type: PokemonType) => (
                 <TypeBadge key={type.name} type={type.name} />
               ))}
             </div>
 
             {/* About Section */}
             <h2
-              className="text-[14px] leading-[16px] font-bold text-center mb-6"
+              className="text-[14px] leading-4 font-bold text-center mb-6"
               style={{ color: typeColor }}
             >
               About
@@ -222,45 +227,45 @@ const PokemonDetailPage = () => {
             <div className="grid grid-cols-3 gap-4 mb-6">
               <div className="flex flex-col items-center gap-2">
                 <div className="flex items-center gap-2">
-                  <Weight className="w-4 h-4 text-[#212121]" />
-                  <span className="text-[#212121] text-[14px] leading-[16px]">
+                  <Weight className="w-4 h-4 text-gray-dark" />
+                  <span className="text-gray-dark text-[14px] leading-4">
                     {(pokemon.weight / 10).toFixed(1)} kg
                   </span>
                 </div>
-                <span className="text-[#666666] text-[12px] leading-[16px]">
+                <span className="text-gray-medium text-[12px] leading-4">
                   Weight
                 </span>
               </div>
 
               <div className="flex flex-col items-center gap-2 border-x border-[#E0E0E0]">
                 <div className="flex items-center gap-2">
-                  <Ruler className="w-4 h-4 text-[#212121]" />
-                  <span className="text-[#212121] text-[14px] leading-[16px]">
+                  <Ruler className="w-4 h-4 text-gray-dark" />
+                  <span className="text-gray-dark text-[14px] leading-4">
                     {(pokemon.height / 10).toFixed(1)} m
                   </span>
                 </div>
-                <span className="text-[#666666] text-[12px] leading-[16px]">
+                <span className="text-gray-mediumum text-[12px] leading-4">
                   Height
                 </span>
               </div>
 
               <div className="flex flex-col items-center gap-2">
-                <span className="text-[#212121] text-[14px] leading-[16px] text-center">
+                <span className="text-gray-dark text-[14px] leading-4 text-center">
                   {abilities}
                 </span>
-                <span className="text-[#666666] text-[12px] leading-[16px]">
+                <span className="text-gray-medium text-[12px] leading-4">
                   Abilities
                 </span>
               </div>
             </div>
 
-            <p className="text-[#212121] text-[14px] leading-[16px] text-justify mb-8">
+            <p className="text-gray-dark text-[14px] leading-4 text-justify mb-8">
               {pokemon.species.description}
             </p>
 
             {/* Base Stats */}
             <h2
-              className="text-[14px] leading-[16px] font-bold text-center mb-6"
+              className="text-[14px] leading-4 font-bold text-center mb-6"
               style={{ color: typeColor }}
             >
               Base Stats
@@ -268,10 +273,10 @@ const PokemonDetailPage = () => {
 
             <div className="flex gap-4">
               <div className="space-y-3">
-                {pokemon.stats.map((stat: any) => (
+                {pokemon.stats.map((stat: PokemonStat) => (
                   <div
                     key={stat.name}
-                    className="text-[12px] leading-[16px] font-bold w-12 text-right"
+                    className="text-[12px] leading-4 font-bold w-12 text-right"
                     style={{ color: typeColor }}
                   >
                     {{
@@ -287,9 +292,9 @@ const PokemonDetailPage = () => {
               </div>
               <div className="w-px bg-[#E0E0E0]" />
               <div className="flex-1 space-y-3">
-                {pokemon.stats.map((stat: any) => (
+                {pokemon.stats.map((stat: PokemonStat) => (
                   <div key={stat.name} className="flex items-center gap-4">
-                    <span className="text-[#212121] text-[14px] leading-[16px] font-semibold w-12">
+                    <span className="text-gray-dark text-[14px] leading-4 font-semibold w-12">
                       {stat.base_stat.toString().padStart(3, "0")}
                     </span>
                     <div

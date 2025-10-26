@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { PokemonCard } from "@/components/molecules/pokemon-card";
 import { SortModal } from "@/components/organisms/sort-modal";
-import { Search, SortAsc, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { getPokemons } from "@/lib/api";
+import { Pokemon } from "@/types/pokemon";
 
 const PokedexPage = () => {
   // --- Hooks -----------------------------------------------------------------
@@ -18,7 +19,7 @@ const PokedexPage = () => {
   const [sortBy, setSortBy] = useState<"number" | "name">("number");
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
-  const [pokemon, setPokemon] = useState<any[]>([]);
+  const [pokemon, setPokemon] = useState<Pokemon[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -61,7 +62,12 @@ const PokedexPage = () => {
 
       try {
         const offset = (currentPage - 1) * limit;
-        const data = await getPokemons(limit, offset, debouncedSearchQuery, sortBy);
+        const data = await getPokemons(
+          limit,
+          offset,
+          debouncedSearchQuery,
+          sortBy
+        );
         setPokemon(data.results);
         setTotalCount(data.count);
       } catch (err) {
@@ -84,11 +90,11 @@ const PokedexPage = () => {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-              <div className="w-10 h-10 border-4 border-[#212121] rounded-full relative">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full border-2 border-[#212121]" />
+              <div className="w-10 h-10 border-4 border-gray-dark rounded-full relative">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full border-2 border-gray-dark" />
               </div>
             </div>
-            <h1 className="text-white text-[24px] leading-[32px] font-bold">
+            <h1 className="text-white text-[24px] leading-8 font-bold">
               Pokédex
             </h1>
           </div>
@@ -101,7 +107,7 @@ const PokedexPage = () => {
                 placeholder="Search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 bg-transparent outline-none text-[14px] leading-[16px] text-[#212121] placeholder:text-[#666666]"
+                className="flex-1 bg-transparent outline-none text-[14px] leading-4 text-gray-dark placeholder:text-gray-medium"
               />
             </div>
 
@@ -110,7 +116,7 @@ const PokedexPage = () => {
               className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_12px_rgba(0,0,0,0.15)] transition-shadow"
             >
               {sortBy === "number" ? (
-                <span className="text-[#DC0A2D] text-[14px] leading-[16px] font-bold">
+                <span className="text-[#DC0A2D] text-[14px] leading-4 font-bold">
                   <Image
                     src="/number.svg"
                     alt="Sort by Number"
@@ -119,7 +125,7 @@ const PokedexPage = () => {
                   />
                 </span>
               ) : (
-                <span className="text-[#DC0A2D] text-[14px] leading-[16px] font-bold">
+                <span className="text-[#DC0A2D] text-[14px] leading-4 font-bold">
                   <Image
                     src="/name.svg"
                     alt="Sort by Name"
@@ -137,7 +143,7 @@ const PokedexPage = () => {
       <main className="px-2 py-6 justify-self-center w-full">
         {isLoading ? (
           <div className="flex justify-center items-center min-h-[400px]">
-            <div className="text-[#666666] text-lg">Loading Pokemon...</div>
+            <div className="text-gray-medium text-lg">Loading Pokemon...</div>
           </div>
         ) : error ? (
           <div className="flex justify-center items-center min-h-[400px]">
@@ -168,7 +174,7 @@ const PokedexPage = () => {
                 >
                   <ChevronLeft className="w-6 h-6 text-[#DC0A2D]" />
                 </button>
-                <span className="text-[#212121] font-medium">
+                <span className="text-gray-dark font-medium">
                   Page {currentPage} of {totalPages}
                 </span>
                 <button

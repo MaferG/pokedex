@@ -4,6 +4,6 @@
  */
 
 export { Button, buttonVariants } from "./button";
-export { Input } from "./input";
 export { Label } from "./label";
 export { TypeBadge } from "./type-badge";
+export { Input } from "./input";

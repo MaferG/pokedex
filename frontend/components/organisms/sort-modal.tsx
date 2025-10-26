@@ -52,7 +52,7 @@ const SortModal = ({
         className="bg-[#DC0A2D] rounded-2xl p-6 w-[280px] shadow-[0_6px_12px_rgba(0,0,0,0.3)]"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-white text-[24px] leading-[32px] font-bold mb-4">
+        <h2 className="text-white text-[24px] leading-8 font-bold mb-4">
           Sort by:
         </h2>
         <div className="bg-white rounded-xl p-6 space-y-4">
@@ -65,9 +65,7 @@ const SortModal = ({
                 <div className="w-3 h-3 rounded-full bg-[#DC0A2D]" />
               )}
             </div>
-            <span className="text-[#212121] text-[14px] leading-[16px]">
-              Number
-            </span>
+            <span className="text-gray-dark text-[14px] leading-4">Number</span>
           </button>
 
           <button
@@ -79,9 +77,7 @@ const SortModal = ({
                 <div className="w-3 h-3 rounded-full bg-[#DC0A2D]" />
               )}
             </div>
-            <span className="text-[#212121] text-[14px] leading-[16px]">
-              Name
-            </span>
+            <span className="text-gray-dark text-[14px] leading-4">Name</span>
           </button>
         </div>
       </div>
