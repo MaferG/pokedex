@@ -228,8 +228,8 @@ export const getSortedPokemonList = async (limit = 20, offset = 0, sortBy = 'num
 };
 
 /**
- * Searches for Pokemon by name (partial match)
- * @param {string} query - Search query (Pokemon name)
+ * Searches for Pokemon by name or number (partial match)
+ * @param {string} query - Search query (Pokemon name or number)
  * @param {number} limit - Number of results to return
  * @param {number} offset - Offset for pagination
  * @returns {Promise<{count: number, results: Array}>} Matching Pokemon
@@ -237,13 +237,41 @@ export const getSortedPokemonList = async (limit = 20, offset = 0, sortBy = 'num
  */
 export const searchPokemonByName = async (query, limit = 20, offset = 0) => {
   try {
-    // Fetch all Pokemon names (lightweight)
+    // Check if query is a pure number (exact ID search)
+    const isExactNumber = /^\d+$/.test(query.trim());
+
+    if (isExactNumber) {
+      // Direct search by exact Pokemon ID
+      const pokemonId = parseInt(query.trim());
+      try {
+        const response = await axios.get(`${CONFIG.POKEAPI_BASE_URL}/pokemon/${pokemonId}`);
+        const pokemon = response.data;
+        return {
+          count: 1,
+          results: [{
+            id: pokemon.id,
+            name: pokemon.name,
+            url: `${CONFIG.POKEAPI_BASE_URL}/pokemon/${pokemon.id}`,
+            image: pokemon.sprites.other['official-artwork'].front_default ||
+                   pokemon.sprites.front_default,
+          }],
+        };
+      } catch (error) {
+        // If exact ID not found, return empty results
+        return {
+          count: 0,
+          results: [],
+        };
+      }
+    }
+
+    // For name searches or partial matches, fetch list and filter
     const allNamesResponse = await axios.get(`${CONFIG.POKEAPI_BASE_URL}/pokemon`, {
       params: { limit: 2000, offset: 0 },
     });
 
     // Filter Pokemon by partial name match
-    const searchLower = query.toLowerCase();
+    const searchLower = query.toLowerCase().trim();
     const filteredNames = allNamesResponse.data.results.filter(pokemon =>
       pokemon.name.toLowerCase().includes(searchLower)
     );
