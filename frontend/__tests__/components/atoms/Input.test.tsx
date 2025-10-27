@@ -2,64 +2,64 @@
  * Tests for Input component
  * @module __tests__/components/atoms/Input
  */
+import "@testing-library/jest-dom";
+import React from "react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { Input } from "@/components/atoms/input";
 
-import React from 'react';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { Input } from '@/components/atoms/input';
-
-describe('Input', () => {
-  it('renders input field', () => {
+describe("Input", () => {
+  it("renders input field", () => {
     render(<Input placeholder="Enter text" />);
-    expect(screen.getByPlaceholderText('Enter text')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Enter text")).toBeInTheDocument();
   });
 
-  it('handles text input', async () => {
+  it("handles text input", async () => {
     const user = userEvent.setup();
     render(<Input placeholder="Search" />);
 
-    const input = screen.getByPlaceholderText('Search');
-    await user.type(input, 'Pikachu');
+    const input = screen.getByPlaceholderText("Search");
+    await user.type(input, "Pikachu");
 
-    expect(input).toHaveValue('Pikachu');
+    expect(input).toHaveValue("Pikachu");
   });
 
-  it('handles onChange events', async () => {
+  it("handles onChange events", async () => {
     const handleChange = jest.fn();
     const user = userEvent.setup();
 
     render(<Input onChange={handleChange} />);
-    const input = screen.getByRole('textbox');
+    const input = screen.getByRole("textbox");
 
-    await user.type(input, 'test');
+    await user.type(input, "test");
     expect(handleChange).toHaveBeenCalled();
   });
 
-  it('is disabled when disabled prop is true', () => {
+  it("is disabled when disabled prop is true", () => {
     render(<Input disabled />);
-    expect(screen.getByRole('textbox')).toBeDisabled();
+    expect(screen.getByRole("textbox")).toBeDisabled();
   });
 
-  it('accepts different input types', () => {
+  it("accepts different input types", () => {
     const { rerender } = render(<Input type="text" />);
-    expect(screen.getByRole('textbox')).toHaveAttribute('type', 'text');
+    expect(screen.getByRole("textbox")).toHaveAttribute("type", "text");
 
     rerender(<Input type="email" />);
-    expect(screen.getByRole('textbox')).toHaveAttribute('type', 'email');
+    expect(screen.getByRole("textbox")).toHaveAttribute("type", "email");
 
     rerender(<Input type="password" />);
     const passwordInput = document.querySelector('input[type="password"]');
     expect(passwordInput).toBeInTheDocument();
   });
 
-  it('renders with custom className', () => {
+  it("renders with custom className", () => {
     render(<Input className="custom-class" />);
-    expect(screen.getByRole('textbox')).toHaveClass('custom-class');
+    expect(screen.getByRole("textbox")).toHaveClass("custom-class");
   });
 
-  it('supports controlled input', async () => {
+  it("supports controlled input", async () => {
     const TestComponent = () => {
-      const [value, setValue] = React.useState('');
+      const [value, setValue] = React.useState("");
       return (
         <Input
           value={value}
@@ -72,9 +72,9 @@ describe('Input', () => {
     const user = userEvent.setup();
     render(<TestComponent />);
 
-    const input = screen.getByPlaceholderText('Controlled');
-    await user.type(input, 'test');
+    const input = screen.getByPlaceholderText("Controlled");
+    await user.type(input, "test");
 
-    expect(input).toHaveValue('test');
+    expect(input).toHaveValue("test");
   });
 });
