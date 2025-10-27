@@ -3,7 +3,7 @@
  * @module __tests__/auth/login-flow
  */
 
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { saveAuthToken, getAuthToken, clearAuthToken } from '@/utils/storage';
@@ -46,6 +46,12 @@ describe('Login Flow Integration Tests', () => {
     localStorageMock.clear();
     document.cookie = '';
     jest.clearAllMocks();
+
+    // Reset Zustand store state
+    useAuthStore.setState({
+      token: null,
+      isAuthenticated: false,
+    });
   });
 
   describe('Authentication Store', () => {
@@ -61,7 +67,9 @@ describe('Login Flow Integration Tests', () => {
       const mockToken = 'test-token-123';
       const expiresAt = Date.now() + 3600000; // 1 hour from now
 
-      result.current.login(mockToken, expiresAt);
+      act(() => {
+        result.current.login(mockToken, expiresAt);
+      });
 
       expect(result.current.isAuthenticated).toBe(true);
       expect(result.current.token).toBe(mockToken);
@@ -73,11 +81,15 @@ describe('Login Flow Integration Tests', () => {
       const expiresAt = Date.now() + 3600000;
 
       // Login first
-      result.current.login(mockToken, expiresAt);
+      act(() => {
+        result.current.login(mockToken, expiresAt);
+      });
       expect(result.current.isAuthenticated).toBe(true);
 
       // Then logout
-      result.current.logout();
+      act(() => {
+        result.current.logout();
+      });
       expect(result.current.isAuthenticated).toBe(false);
       expect(result.current.token).toBeNull();
     });
@@ -87,7 +99,9 @@ describe('Login Flow Integration Tests', () => {
       const mockToken = 'test-token-123';
       const expiresAt = Date.now() + 3600000;
 
-      result.current.login(mockToken, expiresAt);
+      act(() => {
+        result.current.login(mockToken, expiresAt);
+      });
 
       expect(localStorage.getItem('pokedex_auth_token')).toBe(mockToken);
       expect(localStorage.getItem('pokedex_token_expiry')).toBe(expiresAt.toString());
@@ -106,7 +120,9 @@ describe('Login Flow Integration Tests', () => {
       expect(result.current.isAuthenticated).toBe(false);
 
       // Check auth should restore state
-      result.current.checkAuth();
+      act(() => {
+        result.current.checkAuth();
+      });
 
       expect(result.current.isAuthenticated).toBe(true);
       expect(result.current.token).toBe(mockToken);
@@ -121,7 +137,9 @@ describe('Login Flow Integration Tests', () => {
       localStorage.setItem('pokedex_token_expiry', expiredTime.toString());
 
       const { result } = renderHook(() => useAuthStore());
-      result.current.checkAuth();
+      act(() => {
+        result.current.checkAuth();
+      });
 
       expect(result.current.isAuthenticated).toBe(false);
       expect(result.current.token).toBeNull();
@@ -189,7 +207,9 @@ describe('Login Flow Integration Tests', () => {
       const expiresAt = Date.now() + 3600000;
 
       // Simulate login
-      result.current.login(mockToken, expiresAt);
+      act(() => {
+        result.current.login(mockToken, expiresAt);
+      });
 
       expect(result.current.isAuthenticated).toBe(true);
 
@@ -203,17 +223,29 @@ describe('Login Flow Integration Tests', () => {
 
       // First "session" - user logs in
       const { result: firstSession } = renderHook(() => useAuthStore());
-      firstSession.current.login(mockToken, expiresAt);
+      act(() => {
+        firstSession.current.login(mockToken, expiresAt);
+      });
       expect(firstSession.current.isAuthenticated).toBe(true);
+
+      // Simulate page refresh by resetting store state but keeping localStorage
+      act(() => {
+        useAuthStore.setState({
+          token: null,
+          isAuthenticated: false,
+        });
+      });
 
       // Second "session" - page refresh, new hook instance
       const { result: secondSession } = renderHook(() => useAuthStore());
 
-      // Should start unauthenticated
+      // Should start unauthenticated after reset
       expect(secondSession.current.isAuthenticated).toBe(false);
 
-      // After checkAuth, should restore state
-      secondSession.current.checkAuth();
+      // After checkAuth, should restore state from localStorage
+      act(() => {
+        secondSession.current.checkAuth();
+      });
       expect(secondSession.current.isAuthenticated).toBe(true);
       expect(secondSession.current.token).toBe(mockToken);
     });
@@ -225,12 +257,16 @@ describe('Login Flow Integration Tests', () => {
       const { result } = renderHook(() => useAuthStore());
 
       // Login
-      result.current.login(mockToken, expiresAt);
+      act(() => {
+        result.current.login(mockToken, expiresAt);
+      });
       expect(result.current.isAuthenticated).toBe(true);
       expect(getAuthToken()).toBe(mockToken);
 
       // Logout
-      result.current.logout();
+      act(() => {
+        result.current.logout();
+      });
       expect(result.current.isAuthenticated).toBe(false);
       expect(getAuthToken()).toBeNull();
     });
@@ -246,7 +282,9 @@ describe('Login Flow Integration Tests', () => {
       localStorage.setItem('pokedex_token_expiry', expiredTime.toString());
 
       const { result } = renderHook(() => useAuthStore());
-      result.current.checkAuth();
+      act(() => {
+        result.current.checkAuth();
+      });
 
       // Should clear expired token and set to unauthenticated
       expect(result.current.isAuthenticated).toBe(false);
@@ -261,7 +299,9 @@ describe('Login Flow Integration Tests', () => {
       localStorage.setItem('pokedex_token_expiry', futureTime.toString());
 
       const { result } = renderHook(() => useAuthStore());
-      result.current.checkAuth();
+      act(() => {
+        result.current.checkAuth();
+      });
 
       expect(result.current.isAuthenticated).toBe(true);
       expect(result.current.token).toBe(validToken);
@@ -275,7 +315,9 @@ describe('Login Flow Integration Tests', () => {
       localStorage.setItem('pokedex_token_expiry', justExpiredTime.toString());
 
       const { result } = renderHook(() => useAuthStore());
-      result.current.checkAuth();
+      act(() => {
+        result.current.checkAuth();
+      });
 
       expect(result.current.isAuthenticated).toBe(false);
     });
@@ -292,13 +334,17 @@ describe('Login Flow Integration Tests', () => {
       // Login should fully set authenticated state
       const token = 'test-token';
       const expiresAt = Date.now() + 3600000;
-      result.current.login(token, expiresAt);
+      act(() => {
+        result.current.login(token, expiresAt);
+      });
 
       expect(result.current.isAuthenticated).toBe(true);
       expect(result.current.token).toBe(token);
 
       // Logout should fully clear state
-      result.current.logout();
+      act(() => {
+        result.current.logout();
+      });
       expect(result.current.isAuthenticated).toBe(false);
       expect(result.current.token).toBeNull();
     });
